@@ -8,17 +8,16 @@ const router = Router()
 interface ReadAloudRequest extends Request {
 	body: {
 		text: string
-		voice: string
 	}
 }
 
 router.post("/", authenticateJWT, async (req: ReadAloudRequest, res) => {
-	const { text, voice } = req.body
+	const { text } = req.body
 
 	const response = await fetch(`${process.env.TTS_API_URL}/synthesize`, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ text, voice })
+		body: JSON.stringify({ text, voice: "en_US-ryan-high" })
 	})
 
 	const audioBuffer = await response.arrayBuffer()

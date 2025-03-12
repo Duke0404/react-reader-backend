@@ -42,13 +42,12 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017/readerdb
       - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=48h
       - TRANSLATE_API_URL="http://localhost:${TRANSLATE_API_PORT}"
-      - PIPER_API_URL=http://piper:10200
+      - TTS_API_URL=http://piper:10200
     volumes:
       - ./src:/app/src
       - /app/node_modules
-    command: sh -c "npm install && npm run dev"
+    command: npm run dev
 
 volumes:
   mongo-data:
