@@ -1,0 +1,55 @@
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  libretranslate:
+    image: libretranslate/libretranslate
+    container_name: libretranslate
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - libretranslate-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${TRANSLATE_API_PORT}"]
+      interval: 30s
+      timeout: 10s
+      retries: 120
+      start_period: 5m
+
+  piper:
+    image: artibex/piper-http
+    container_name: piper
+    ports:
+      - "10200:10200"
+    environment:
+      - MODEL_DOWNLOAD_LINK=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/high/en_US-lessac-high.onnx?download=true
+
+  app:
+    build: .
+    container_name: express-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - libretranslate
+      - piper
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/readerdb
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=48h
+      - TRANSLATE_API_URL="http://localhost:${TRANSLATE_API_PORT}"
+      - PIPER_API_URL=http://piper:10200
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev"
+
+volumes:
+  mongo-data:
+  libretranslate-data:
