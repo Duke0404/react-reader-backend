@@ -8,20 +8,20 @@ DATA_DIR=${DATA_DIR:-"/data"}
 
 # Hardcoded URLs for Argos Translate models
 declare -A MODEL_URLS=(
-    ["en_pl"]="https://example.com/path/to/en_pl.argosmodel"
-    ["pl_en"]="https://example.com/path/to/pl_en.argosmodel"
-    ["en_de"]="https://example.com/path/to/en_de.argosmodel"
-    ["de_en"]="https://example.com/path/to/de_en.argosmodel"
-    ["en_fr"]="https://example.com/path/to/en_fr.argosmodel"
-    ["fr_en"]="https://example.com/path/to/fr_en.argosmodel"
-    ["en_es"]="https://example.com/path/to/en_es.argosmodel"
-    ["es_en"]="https://example.com/path/to/es_en.argosmodel"
-    ["en_it"]="https://example.com/path/to/en_it.argosmodel"
-    ["it_en"]="https://example.com/path/to/it_en.argosmodel"
-    ["en_pt"]="https://example.com/path/to/en_pt.argosmodel"
-    ["pt_en"]="https://example.com/path/to/pt_en.argosmodel"
-    ["en_nl"]="https://example.com/path/to/en_nl.argosmodel"
-    ["nl_en"]="https://example.com/path/to/nl_en.argosmodel"
+    ["en_pl"]="https://argos-net.com/v1/translate-en_pl-1_9.argosmodel"
+    ["pl_en"]="https://argos-net.com/v1/translate-pl_en-1_9.argosmodel"
+    ["en_de"]="https://argos-net.com/v1/translate-en_de-1_9.argosmodel"
+    ["de_en"]="https://argos-net.com/v1/translate-de_en-1_9.argosmodel"
+    ["en_fr"]="https://argos-net.com/v1/translate-en_fr-1_9.argosmodel"
+    ["fr_en"]="https://argos-net.com/v1/translate-fr_en-1_9.argosmodel"
+    ["en_es"]="https://argos-net.com/v1/translate-en_es-1_0.argosmodel"
+    ["es_en"]="https://argos-net.com/v1/translate-es_en-1_0.argosmodel"
+    ["en_it"]="https://argos-net.com/v1/translate-en_it-1_0.argosmodel"
+    ["it_en"]="https://argos-net.com/v1/translate-it_en-1_0.argosmodel"
+    ["en_pt"]="https://argos-net.com/v1/translate-en_pt-1_0.argosmodel"
+    ["pt_en"]="https://argos-net.com/v1/translate-pt_en-1_0.argosmodel"
+    ["en_nl"]="https://argos-net.com/v1/translate-en_nl-1_8.argosmodel"
+    ["nl_en"]="https://argos-net.com/v1/translate-nl_en-1_8.argosmodel"
 )
 
 # Download Argos Translate models
@@ -31,7 +31,7 @@ if [ ! -f $DATA_DIR/libretranslate/DOWNLOAD_COMPLETE ]; then
 
   for lang_pair in "${!MODEL_URLS[@]}"; do
     echo "📦 Downloading $lang_pair from ${MODEL_URLS[$lang_pair]}..."
-    wget -O "$DATA_DIR/libretranslate/models/$lang_pair.argosmodel" "${MODEL_URLS[$lang_pair]}"
+    wget -v -O"$DATA_DIR/libretranslate/models/$lang_pair.argosmodel" "${MODEL_URLS[$lang_pair]}"
   done
 
   echo "✅ Argos models downloaded."

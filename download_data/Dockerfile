@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-WORKDIR /downloader
+WORKDIR /
 
 # Install required system packages
 RUN apk add --no-cache \
@@ -8,9 +8,9 @@ RUN apk add --no-cache \
     bash
 
 # Copy entrypoint script into the container
-COPY entrypoint.sh ./entrypoint.sh
+COPY entrypoint.sh entrypoint.sh
 
 # Give the script executable permissions
 RUN chmod +x ./entrypoint.sh
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["bash", "entrypoint.sh"]
