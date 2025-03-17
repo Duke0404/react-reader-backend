@@ -1,0 +1,9 @@
+services:
+  model-downloader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: model-downloader
+    volumes:
+      - ./data:/data
+    restart: on-failure

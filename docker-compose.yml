@@ -2,31 +2,27 @@ services:
   mongodb:
     image: mongo
     container_name: mongodb
-    ports:
-      - "27017:27017"
     volumes:
       - mongo-data:/data/db
 
   libretranslate:
     image: libretranslate/libretranslate
     container_name: libretranslate
-    restart: always
+    restart: unless-stopped
     ports:
       - "5000:5000"
     volumes:
       - libretranslate-data:/app/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${TRANSLATE_API_PORT}"]
-      interval: 30s
-      timeout: 10s
-      retries: 120
-      start_period: 5m
+      test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
+    environment:
+      - LT_DEBUG=true
+      - LT_UPDATE_MODELS=false
+      - LT_LOAD_ONLY=en,pl
 
   piper:
     image: artibex/piper-http
     container_name: piper
-    ports:
-      - "10200:10200"
     environment:
       - MODEL_DOWNLOAD_LINK=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/high/en_US-lessac-high.onnx?download=true
 
@@ -42,8 +38,8 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017/readerdb
       - JWT_SECRET=${JWT_SECRET}
-      - TRANSLATE_API_URL="http://localhost:${TRANSLATE_API_PORT}"
-      - TTS_API_URL=http://piper:10200
+      - TRANSLATE_API_URL="http://libretranslate:5000"
+      - TTS_API_URL=http://piper:5000
     volumes:
       - ./src:/app/src
       - /app/node_modules
