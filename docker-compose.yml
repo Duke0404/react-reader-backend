@@ -1,50 +1,54 @@
 services:
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    volumes:
-      - mongo-data:/data/db
+    mongodb:
+        image: mongo
+        container_name: mongodb
+        volumes:
+            - mongo-data:/data/db
 
-  libretranslate:
-    image: libretranslate/libretranslate
-    container_name: libretranslate
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
-    volumes:
-      - libretranslate-data:/app/data
-    healthcheck:
-      test: ['CMD-SHELL', './venv/bin/python scripts/healthcheck.py']
-    environment:
-      - LT_DEBUG=true
-      - LT_UPDATE_MODELS=false
-      - LT_LOAD_ONLY=en,pl
+    libretranslate:
+        image: libretranslate/libretranslate
+        container_name: libretranslate
+        restart: unless-stopped
+        ports:
+            - "5000:5000"
+        volumes:
+            - libretranslate-data:/home/libretranslate/.local:rw
+        healthcheck:
+            test: ["CMD-SHELL", "./venv/bin/python scripts/healthcheck.py"]
+        environment:
+            - LT_UPDATE_MODELS=true
+            - LT_LOAD_ONLY=en,pl,de,fr,es,it,pt,nl
+            - LT_DISABLE_FILES_TRANSLATION=true
+            - LT_DISABLE_WEB_UI=true
 
-  piper:
-    image: artibex/piper-http
-    container_name: piper
-    environment:
-      - MODEL_DOWNLOAD_LINK=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/high/en_US-lessac-high.onnx?download=true
+    piper:
+        image: artibex/piper-http
+        container_name: piper
+        restart: unless-stopped
+        environment:
+            - MODEL_DOWNLOAD_LINK=https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/high/en_US-lessac-high.onnx?download=true
+        ports:
+            - "10200:5000"
 
-  app:
-    build: .
-    container_name: express-app
-    ports:
-      - "3000:3000"
-    depends_on:
-      - mongodb
-      - libretranslate
-      - piper
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/readerdb
-      - JWT_SECRET=${JWT_SECRET}
-      - TRANSLATE_API_URL="http://libretranslate:5000"
-      - TTS_API_URL=http://piper:5000
-    volumes:
-      - ./src:/app/src
-      - /app/node_modules
-    command: npm run dev
+    app:
+        build: .
+        container_name: express-app
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mongodb
+            - libretranslate
+            - piper
+        environment:
+            - MONGO_URI=mongodb://mongodb:27017/readerdb
+            - JWT_SECRET=${JWT_SECRET}
+            - TRANSLATE_API_URL=http://libretranslate:5000
+            - TTS_API_URL=http://piper:5000
+        volumes:
+            - ./src:/app/src
+            - /app/node_modules
+        command: npm run dev
 
 volumes:
-  mongo-data:
-  libretranslate-data:
+    mongo-data:
+    libretranslate-data:

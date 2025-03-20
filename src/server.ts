@@ -14,11 +14,12 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-app.use("/api/auth", authRoutes)
-app.use("/api/translate", translateRoutes)
-app.use("/api/tts", ttsRoutes)
+app.use("/auth", authRoutes)
+app.use("/translate", translateRoutes)
+app.use("/readAloud", ttsRoutes)
 
 app.get("/health", (_, res) => {
+    console.log("Health check URL was hit")
     res.send("Server is healthy")
 })
 
