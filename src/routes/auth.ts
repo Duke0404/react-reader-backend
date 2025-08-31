@@ -1,6 +1,6 @@
 import { compare, hash } from "bcryptjs"
-import { Request, Router } from "express"
-import { sign } from "jsonwebtoken"
+import { Request, Router, Response } from "express"
+import { sign, verify } from "jsonwebtoken"
 import { z } from "zod"
 
 import User from "../models/User"
@@ -25,7 +25,7 @@ function generateToken(userId: string): string {
 }
 
 // Utility function to send a success response with a token set as HTTP-only cookie
-function sendTokenResponse(res: any, userId: string, message: string) {
+function sendTokenResponse(res: Response, userId: string, message: string) {
 	const token = generateToken(userId)
 	
 	// Set the JWT as an HTTP-only cookie
@@ -104,6 +104,30 @@ router.post("/login", async (req: AuthRequest, res) => {
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ message: "Server error" })
+	}
+})
+
+// Validate route to check if the JWT token is valid
+router.get("/validate", (req, res) => {
+	// Extract the token from the HTTP-only cookie
+	const token = req.cookies?.token
+	
+	// If no token is provided, return unauthorized
+	if (!token) {
+		res.status(401).json({ message: "No token provided" })
+		return
+	}
+	
+	try {
+		// Verify the token
+		const decoded = verify(token, process.env.JWT_SECRET as string) as { id: string }
+		
+		// Token is valid
+		res.status(200).json({ message: "Token is valid", userId: decoded.id })
+	} catch (err) {
+		// Token is invalid or expired
+		console.error(err)
+		res.status(401).json({ message: "Invalid or expired token" })
 	}
 })
 
