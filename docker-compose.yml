@@ -44,7 +44,7 @@ services:
         environment:
             - MONGO_URI=mongodb://mongodb:27017/readerdb
             - JWT_SECRET=${JWT_SECRET}
-            - TRANSLATE_API_URL=http://libretranslate:5001
+            - TRANSLATE_API_URL=http://libretranslate:5000
             - TTS_API_URL=http://piper:5000
         volumes:
             - ./src:/app/src
