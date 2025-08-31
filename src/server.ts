@@ -5,11 +5,19 @@ import * as express from "express"
 
 import connectDB from "./config/db"
 import authRoutes from "./routes/auth"
+import libraryRoutes from "./routes/library"
 import ttsRoutes from "./routes/readAloud"
 import translateRoutes from "./routes/translate"
+import { initGridFS } from "./services/gridfs"
+import mongoose from "mongoose"
 
 dotenv.config()
 connectDB()
+
+// Initialize GridFS after MongoDB connects
+mongoose.connection.once("open", () => {
+	initGridFS()
+})
 
 const app = express()
 app.use(cors({
@@ -17,9 +25,10 @@ app.use(cors({
 	credentials: true
 }))
 app.use(cookieParser())
-app.use(express.json())
+app.use(express.json({ limit: '50mb' }))
 
 app.use("/auth", authRoutes)
+app.use("/library", libraryRoutes)
 app.use("/translate", translateRoutes)
 app.use("/readAloud", ttsRoutes)
 
