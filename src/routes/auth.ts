@@ -24,10 +24,19 @@ function generateToken(userId: string): string {
 	})
 }
 
-// Utility function to send a success response with a token
+// Utility function to send a success response with a token set as HTTP-only cookie
 function sendTokenResponse(res: any, userId: string, message: string) {
 	const token = generateToken(userId)
-	res.status(201).json({ message, token })
+	
+	// Set the JWT as an HTTP-only cookie
+	res.cookie("token", token, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+		sameSite: "strict", // CSRF protection
+		maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days in milliseconds
+	})
+	
+	res.status(201).json({ message })
 }
 
 // Register route
@@ -96,6 +105,16 @@ router.post("/login", async (req: AuthRequest, res) => {
 		console.error(error)
 		res.status(500).json({ message: "Server error" })
 	}
+})
+
+// Logout route to clear the HTTP-only cookie
+router.post("/logout", (req, res) => {
+	res.clearCookie("token", {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+		sameSite: "strict"
+	})
+	res.status(200).json({ message: "Logout successful" })
 })
 
 export default router

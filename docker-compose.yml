@@ -10,7 +10,7 @@ services:
         container_name: libretranslate
         restart: unless-stopped
         ports:
-            - "5000:5000"
+            - "5001:5000"
         volumes:
             - libretranslate-data:/home/libretranslate/.local:rw
         healthcheck:
@@ -20,6 +20,8 @@ services:
             - LT_LOAD_ONLY=en,pl,de,fr,es,it,pt,nl
             - LT_DISABLE_FILES_TRANSLATION=true
             - LT_DISABLE_WEB_UI=true
+            - OMP_NUM_THREADS=1
+            - OPENBLAS_NUM_THREADS=1
 
     piper:
         image: artibex/piper-http
@@ -42,7 +44,7 @@ services:
         environment:
             - MONGO_URI=mongodb://mongodb:27017/readerdb
             - JWT_SECRET=${JWT_SECRET}
-            - TRANSLATE_API_URL=http://libretranslate:5000
+            - TRANSLATE_API_URL=http://libretranslate:5001
             - TTS_API_URL=http://piper:5000
         volumes:
             - ./src:/app/src

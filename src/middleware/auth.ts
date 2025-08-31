@@ -12,8 +12,10 @@ interface AuthRequest extends Request {
 }
 
 export function authenticateJWT(req: AuthRequest, res: Response, next: NextFunction) {
-	// Extract the token from the Authorization header
-	const token = req.header("Authorization")?.split(" ")[1]
+	// Extract the token from the Authorization header or HTTP-only cookie
+	const authToken = req.header("Authorization")?.split(" ")[1]
+	const cookieToken = req.cookies?.token
+	const token = authToken || cookieToken
 
 	// If no token is provided, return a 401 Unauthorized response
 	if (!token) {
@@ -39,6 +41,7 @@ export function authenticateJWT(req: AuthRequest, res: Response, next: NextFunct
 		next()
 	} catch (err) {
 		// Handle token verification errors
+		console.error(err)
 		res.status(401).json({ message: "Invalid token" })
 	}
 }
