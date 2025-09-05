@@ -36,20 +36,19 @@ services:
         build: .
         container_name: express-app
         ports:
-            - "3000:3000"
+            - "3000:3000"   # HTTP
+            - "3443:3443"   # HTTPS
         depends_on:
             - mongodb
             - libretranslate
             - piper
         environment:
+            - NODE_ENV=production
             - MONGO_URI=mongodb://mongodb:27017/readerdb
             - JWT_SECRET=${JWT_SECRET}
             - TRANSLATE_API_URL=http://libretranslate:5000
             - TTS_API_URL=http://piper:5000
-        volumes:
-            - ./src:/app/src
-            - /app/node_modules
-        command: npm run dev
+            - HTTPS_PORT=3443
 
 volumes:
     mongo-data:
